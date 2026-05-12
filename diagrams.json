@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "author": "pranave krishnamurthy",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": -28.2, "left": 124.2, "attrs": {} },
+    { "type": "wokwi-ds1307", "id": "rtc1", "top": 186.6, "left": 307.3, "attrs": {} },
+    {
+      "type": "wokwi-membrane-keypad",
+      "id": "keypad1",
+      "top": -376.4,
+      "left": 197.6,
+      "attrs": {}
+    },
+    { "type": "wokwi-pir-motion-sensor", "id": "pir1", "top": -188, "left": 98.22, "attrs": {} },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 21.6,
+      "left": 1.8,
+      "attrs": { "volume": "0.1" }
+    },
+    {
+      "type": "wokwi-lcd2004",
+      "id": "lcd1",
+      "top": -41.6,
+      "left": 428,
+      "attrs": { "pins": "i2c" }
+    }
+  ],
+  "connections": [
+    [ "rtc1:5V", "uno:5V", "red", [ "h0" ] ],
+    [ "uno:GND.2", "rtc1:GND", "black", [ "v38.3", "h13.5" ] ],
+    [ "rtc1:SDA", "uno:A4", "blue", [ "h0" ] ],
+    [ "rtc1:SCL", "uno:A5", "white", [ "h0" ] ],
+    [ "keypad1:R1", "uno:2", "#8f4814", [ "v9.6", "h67.2" ] ],
+    [ "keypad1:R2", "uno:3", "orange", [ "v9.6", "h38" ] ],
+    [ "keypad1:R3", "uno:4", "blue", [ "v9.6", "h18.9" ] ],
+    [ "keypad1:R4", "uno:5", "violet", [ "v9.6", "h9.4" ] ],
+    [ "keypad1:C1", "uno:6", "magenta", [ "v9.6", "h-9.7" ] ],
+    [ "keypad1:C2", "uno:7", "purple", [ "v9.6", "h-28.8" ] ],
+    [ "keypad1:C4", "uno:9", "gray", [ "v9.6", "h-77.1" ] ],
+    [ "keypad1:C3", "uno:8", "white", [ "v9.6", "h-57.75" ] ],
+    [ "pir1:VCC", "uno:5V", "red", [ "v0" ] ],
+    [ "bz1:1", "uno:GND.3", "black", [ "v67.2", "h278.4" ] ],
+    [ "lcd1:GND", "uno:GND.3", "black", [ "h-28.8", "v182.4" ] ],
+    [ "lcd1:VCC", "uno:5V", "red", [ "h-19.2", "v144.1", "h-124.8" ] ],
+    [ "lcd1:SDA", "uno:A4", "yellow", [ "h0" ] ],
+    [ "lcd1:SCL", "uno:A5", "cyan", [ "h0" ] ],
+    [ "bz1:2", "uno:13", "red", [ "v9.6", "h76.4", "v-163.2", "h134.4" ] ],
+    [ "uno:GND.2", "pir1:GND", "black", [ "v-76.9", "h-111.3" ] ],
+    [ "uno:GND.1", "pir1:GND", "black", [ "v-48", "h-86.1" ] ],
+    [ "pir1:OUT", "uno:11", "green", [ "v57.6", "h124.66" ] ]
+  ],
+  "dependencies": {}
+}
