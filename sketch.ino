@@ -34,8 +34,7 @@ int  alarmHour   = 7;
 int  alarmMinute = 0;
 bool alarmSet    = false;
 
-// FIX 4: moved motionStartTime here (global) so it can be properly
-//        reset both inside and after activateAlarm()
+
 unsigned long motionStartTime = 0;
 unsigned long alarmStartTime  = 0;
 
@@ -185,29 +184,23 @@ void activateAlarm()
   lcd.print("ALARM! MOVE TO STOP!");
 
   alarmStartTime  = millis();
-  motionStartTime = 0;               // FIX 4: always start fresh
+  motionStartTime = 0;
 
-  // FIX 2 & 3: lastMotionTime is still static (fine — it only throttles
-  //            the update rate), but the motionStartTime reset is now
-  //            separated so it only resets on genuine LOW, not during
-  //            the 500 ms debounce window.
   static unsigned long lastMotionTime = 0;
 
   while (millis() - alarmStartTime < 60000)
   {
-    tone(BUZZER_PIN, 1000);           // passive buzzer: tone() works in Wokwi
+    tone(BUZZER_PIN, 1000,550);
 
     int motionDetected = digitalRead(PIR_PIN);
 
     if (motionDetected == HIGH)
     {
-      // ── FIX 2: handle debounce WITHOUT touching motionStartTime ──────────
       if (millis() - lastMotionTime > 500)
       {
         lastMotionTime = millis();
       }
 
-      // Start the sustained-motion timer on the first HIGH reading
       if (motionStartTime == 0)
       {
         motionStartTime = millis();
@@ -216,16 +209,37 @@ void activateAlarm()
       lcd.setCursor(0, 1);
       lcd.print("Motion Detected!    ");
 
-      // Show countdown progress on row 2
       unsigned long elapsed = millis() - motionStartTime;
-      lcd.setCursor(0, 10000);
-      lcd.print("stay: ");
+      lcd.setCursor(0, 2);                         // ← fixed from 10000
+      lcd.print("Hold: ");
       lcd.print((int)(elapsed / 1000));
       lcd.print("s      ");
 
       if (elapsed >= 2000)
       {
-        // ── Alarm dismissed ──────────────────────────────────────────────
+        // ── Motion confirmed — now ring for 35 more seconds ──────────────
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Good! Stay Awake!");
+
+        unsigned long ringDuration = 30000UL;      // ← change this (in ms)
+        unsigned long ringStart    = millis();
+
+        while (millis() - ringStart < ringDuration)
+        {
+          tone(BUZZER_PIN, 1000,550);
+
+          int secLeft = (int)((ringDuration - (millis() - ringStart)) / 1000);
+          lcd.setCursor(0, 1);
+          lcd.print("Stopping in: ");
+          if (secLeft < 10) lcd.print(" ");
+          lcd.print(secLeft);
+          lcd.print("s  ");
+
+          delay(500);
+        }
+
+        // ── All done ─────────────────────────────────────────────────────
         noTone(BUZZER_PIN);
         lcd.clear();
         lcd.setCursor(0, 0);
@@ -234,14 +248,12 @@ void activateAlarm()
         lcd.print("Have a nice day!");
         delay(3000);
 
-        // FIX 4: reset motion timer before returning
         motionStartTime = 0;
         return;
       }
     }
     else
     {
-      // ── FIX 2: motionStartTime reset ONLY on genuine LOW ─────────────
       motionStartTime = 0;
 
       lcd.setCursor(0, 1);
@@ -261,8 +273,5 @@ void activateAlarm()
   lcd.print("Alarm timed out.");
   delay(2000);
 
-  // FIX 4: reset motion timer on timeout path too
   motionStartTime = 0;
 }
-
-
